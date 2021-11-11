@@ -35,4 +35,11 @@ exports.getStats = async () => {
   let response = await fetch('http://127.0.0.1:4067/summary');
   let data = await response.json();
   return data;
-}
+};
+
+exports.getBalance = async (pool, address) => {
+  let response = await fetch(`https://${pool}.2miners.com/api/accounts/${address}`);
+  let data = await response.json();
+  if (data.error || response.status === 404) return 0;
+  return (data.sumrewards[4].reward / 100000000); 
+};

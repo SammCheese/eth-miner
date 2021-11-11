@@ -11,55 +11,67 @@ let x;
 const algorithms = [
   {
     label: 'Ethash (ETH)',
-    value: 'ethash'
+    value: 'ethash',
+    coin: 'ETH'
   },
   {
     label: 'Autolykos2 (ERGO)',
-    value: 'autolykos2'
+    value: 'autolykos2',
+    coin: 'ERGO'
   },
   {
-    label: 'Etchash (ETH CLASSIC)',
-    value: 'etchash'
+    label: 'Etchash (ETC)',
+    value: 'etchash',
+    coin: 'ETC'
   },
   {
     label: 'Firopow (FIRO)',
-    value: 'firopow'
+    value: 'firopow',
+    coin: 'FIRO'
   },
   {
     label: 'Octopus (CFX)',
-    value: 'octopus'
+    value: 'octopus',
+    coin: 'CFX'
   },
   {
     label: 'Kawpow (RVN)',
-    value: 'kawpow'
+    value: 'kawpow',
+    coin: 'RVN'
   },
   {
     label: 'MTP (XZC)',
-    value: 'mtp'
+    value: 'XZC'
   },
   {
     label: 'MTP-tcr (TCR)',
-    value: 'mtp-tcr'
+    value: 'mtp-tcr',
+    coin: 'TCR'
   },
   {
     label: 'Progpow (SERO)',
-    value: 'progpow'
+    value: 'progpow',
+    coin: 'SERO'
   },
   {
     label: 'Progpow-veil (VEIL)',
-    value: 'progpow-veil'
+    value: 'progpow-veil',
+    coin: 'VEIL'
   },
   {
     label: 'Progpow-veriblock (VBK)',
-    value: 'progpow-veriblock'
+    value: 'progpow-veriblock',
+    coin: 'VBK'
   },
   {
     label: 'Progpowz (ZANO)',
-    value: 'progpowz'
+    value: 'progpowz',
+    coin: 'ZANO'
   },
   {
     label: 'Tensority (BTM)',
-    value: 'tensority'
+    value: 'tensority',
+    coin: 'BTM'
   }
 ];
 
@@ -90,10 +102,20 @@ module.exports = class Settings extends React.PureComponent {
       });
       this.forceUpdate();
     }, 1000);
+    this.balInterVal = setInterval(async () => {
+      this.setState({
+        balance: await f.getBalance(
+          this.props.getSetting('coin', 'ETH').toLowerCase(),
+          this.props.getSetting('wallet_address', '0x000000000000000000000000000000000000000')
+        )
+      });
+      this.forceUpdate();
+    }, 10000);
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
+    clearInterval(this.balInterVal);
   }
 
 
@@ -103,6 +125,7 @@ module.exports = class Settings extends React.PureComponent {
     const pool_url = this.props.getSetting('pool_url', 'stratum+tcp://eu1.ethermine.org:4444');
     const intensity = this.props.getSetting('intensity', '9');
     const algo = this.props.getSetting('algorithm', 'ethash');
+    const coin = this.props.getSetting('coin', 'ETH');
 
     return (
       <div className='eth-miner'>
@@ -117,7 +140,7 @@ module.exports = class Settings extends React.PureComponent {
             {this.state.balance.toFixed(8)}
           </div>
           <div className='eth-counter-add'>
-            ETH
+            {coin}
           </div>
           <div className='eth-info'>
             <div className='eth-info-item'>
@@ -153,12 +176,14 @@ module.exports = class Settings extends React.PureComponent {
           <div className='configuration-section'>
             <SelectInput
               value={this.props.getSetting('algorithm', 'ethash')}
-              onChange={({ value }) => {
+              onChange={({ value, coin }) => {
                 this.props.updateSetting('algorithm', value);
+                this.props.updateSetting('coin', coin);
               }}
               options={algorithms.map(alg => ({
                 label: alg.label,
-                value: alg.value
+                value: alg.value,
+                coin: alg.coin
               }))}
               required={true}
               disabled={running}
