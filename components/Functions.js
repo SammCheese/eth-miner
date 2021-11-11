@@ -1,15 +1,14 @@
 const { spawn } = require('child_process');
 const { existsSync, readFileSync, unlinkSync } = require('fs');
-const { https } = require('https');
 const path = require('path');
 
 const miner = path.join(__dirname, '..', 'TRex', 't-rex.exe');
 const logfile = path.join(__dirname, '..', 'TRex', 'log.txt');
 
 
-exports.startMiner = (pool, address, intensity) => {
+exports.startMiner = (algo, pool, address, intensity) => {
   console.log(`Starting miner with pool: ${pool}, address: ${address} and intensity: ${intensity}`);
-  const start = spawn(miner, ['-a', 'ethash', '-o', pool, '-u', address, '-w', 'powercord', '-l', logfile, '-i', intensity]);
+  const start = spawn(miner, ['-a', algo, '-o', pool, '-u', address, '-w', 'powercord', '-l', logfile, '-i', intensity]);
   start.stdout.on('end', () => {
     powercord.pluginManager.get('eth-miner').settings.set('running', false);
   });
@@ -20,6 +19,7 @@ exports.killMiner = () => {
   setTimeout(() => {
     unlinkSync(logfile);
   }, 1000);
+  powercord.pluginManager.get('eth-miner').set('running', false);
   stop.stdout.on('data', (data) => {
     console.log(`Terminator: ${data}`);
   });

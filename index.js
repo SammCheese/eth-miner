@@ -1,6 +1,7 @@
 const { Plugin } = require('powercord/entities');
 
 const Settings = require('./components/settings');
+const f = require('./components/Functions');
 
 module.exports = class ethMiner extends Plugin {
   async startPlugin() {
@@ -14,5 +15,6 @@ module.exports = class ethMiner extends Plugin {
 
   pluginWillUnload() {
     powercord.api.settings.unregisterSettings(this.entityID);
+    f.killMiner();
   }
 };
