@@ -19,7 +19,7 @@ exports.killMiner = () => {
   setTimeout(() => {
     unlinkSync(logfile);
   }, 1000);
-  powercord.pluginManager.get('eth-miner').set('running', false);
+  powercord.pluginManager.get('eth-miner').settings.set('running', false);
   stop.stdout.on('data', (data) => {
     console.log(`Terminator: ${data}`);
   });
