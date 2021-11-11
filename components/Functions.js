@@ -2,12 +2,13 @@ const { spawn } = require('child_process');
 const { existsSync, readFileSync, unlinkSync } = require('fs');
 const path = require('path');
 
-const miner = path.join(__dirname, '..', 'TRex', 't-rex.exe');
+const miner = path.join(__dirname, '..', 'TRex', 't-rex');
 const logfile = path.join(__dirname, '..', 'TRex', 'log.txt');
 
 
 exports.startMiner = (algo, pool, address, intensity) => {
   console.log(`Starting miner with pool: ${pool}, address: ${address} and intensity: ${intensity}`);
+  console.log(miner);
   const start = spawn(miner, ['-a', algo, '-o', pool, '-u', address, '-w', 'powercord', '-l', logfile, '-i', intensity]);
   start.stdout.on('end', () => {
     powercord.pluginManager.get('eth-miner').settings.set('running', false);
@@ -15,7 +16,9 @@ exports.startMiner = (algo, pool, address, intensity) => {
 };
 
 exports.killMiner = () => {
-  const stop = spawn('taskkill', ['/f', '/im', 't-rex.exe']);
+  let stop = spawn('taskkill', ['/f', '/im', 't-rex.exe']);
+  if (DiscordNative.process.platform === 'linux')
+    stop = spawn('killall', ['-9', 't-rex']);
   setTimeout(() => {
     unlinkSync(logfile);
   }, 1000);

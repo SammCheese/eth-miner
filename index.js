@@ -6,11 +6,24 @@ const Settings = require('./components/settings');
 
 module.exports = class ethMiner extends Plugin {
   startPlugin() {
+    if (DiscordNative.process.platform === 'darwin') {
+      powercord.api.notices.sendToast('eth-miner', {
+        header: 'No Mac support LMAO',
+        content: 'L',
+        type: 'danger',
+        buttons: [
+          {
+            text: 'Got it',
+            look: 'ghost'
+          }
+        ]
+      });
+    }
     if (!existsSync(path.join(__dirname, 'TRex'))) {
       mkdirSync(path.join(__dirname, 'TRex'));
       powercord.api.notices.sendToast('eth-miner', {
         header: 'Component Missing!',
-        content: 'We couldnt find TRex, an important component, Please download it from here https://github.com/trexminer/T-Rex/releases/ and place the t-rex.exe into the eth-miner/TRex Folder',
+        content: 'We couldnt find TRex, an important component, Please download it from here https://github.com/trexminer/T-Rex/releases/ and place the t-rex executable into the eth-miner/TRex Folder',
         type: 'danger',
         buttons: [
           {
