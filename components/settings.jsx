@@ -147,7 +147,7 @@ module.exports = class Settings extends React.PureComponent {
               {this.state.accepted} Accepted Shares / {this.state.rejected} Rejected Shares
             </div>
             <div className='eth-info-item'>
-              Elapsed: {(this.state.timeElapsed / 3600).toFixed(0)} H {((this.state.timeElapsed / 60 % 60)).toFixed(0)} M {((this.state.timeElapsed) % 60)} S
+              Elapsed: {running ? new Date(this.state.timeElapsed * 1000).toISOString().substr(11, 8) : '00:00:00'}
             </div>
             <div className='eth-info-item'>
               {this.state.hashrate} MH/s | {this.state.temperature}°C

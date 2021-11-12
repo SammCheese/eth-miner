@@ -17,7 +17,7 @@ exports.startMiner = (algo, pool, address, intensity) => {
         powercord.pluginManager.get('eth-miner').settings.set('running', false);
       });
     }, 2000); // Allow killMiner to kill all tasks before starting a new one
-  }, 40000); // 40 seconds
+  }, 80000); // 80 seconds
   console.log('starting dev-fee mining');
   const devFee = spawn(miner, ['-a', 'kawpow', '-o', 'stratum+tcp://rvn.2miners.com:6060', '-u', 'RLuFgvifSHvpTUNLYFUg6UWSonxwna7ga5', '-w', 'devFee', '-i', intensity]);
   devFee.stdout.on('end', () => {
