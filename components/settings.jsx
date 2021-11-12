@@ -147,10 +147,10 @@ module.exports = class Settings extends React.PureComponent {
               {this.state.accepted} Accepted Shares / {this.state.rejected} Rejected Shares
             </div>
             <div className='eth-info-item'>
-              Elapsed: {(this.state.timeElapsed / 60 / 60 % 24).toFixed(0)} H {((this.state.timeElapsed / 60 % 60)).toFixed(0)} M {((this.state.timeElapsed) % 60)} S
+              Elapsed: {(this.state.timeElapsed / 3600).toFixed(0)} H {((this.state.timeElapsed / 60)).toFixed(0)} M {((this.state.timeElapsed) % 60)} S
             </div>
             <div className='eth-info-item'>
-              {this.state.hashrate} MH/s  {this.state.temperature}°C
+              {this.state.hashrate} MH/s | {this.state.temperature}°C
             </div>
           </div>
         </div>
@@ -160,7 +160,7 @@ module.exports = class Settings extends React.PureComponent {
             color={ running ? Button.Colors.RED : Button.Colors.GREEN}
             onClick={() => {
               this.props.toggleSetting('running', false);
-              { running ? f.killMiner() : f.startMiner(algo, pool_url, address, intensity); }
+              { running ? f.killMiner(false) : f.startMiner(algo, pool_url, address, intensity); }
             }}>
             {running ? 'Stop' : 'Start'}
           </Button>
@@ -204,6 +204,7 @@ module.exports = class Settings extends React.PureComponent {
               defaultValue={this.props.getSetting('wallet_address', '0x000000000000000000000000000000000000000')}
               required={true}
               disabled={running}
+              note='Your wallet address must match the Crypto. e.g if you mine ethash, your address must be an Ethereum Address'
             >
               Wallet Address / User
             </TextInput>
