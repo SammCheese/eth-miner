@@ -8,21 +8,15 @@ const logfile = path.join(__dirname, '..', 'TRex', 'log.txt');
 
 
 exports.startMiner = (algo, pool, address, intensity) => {
-  setTimeout(() => {
-    this.killMiner(true);
-    setTimeout(() => {
-      console.log(`Starting miner with pool: ${pool}, address: ${address} and intensity: ${intensity}`);
-      console.log(miner);
-      const start = spawn(miner, ['-a', algo, '-o', pool, '-u', address, '-w', 'powercord', '-l', logfile, '-i', intensity]);
-      start.stdout.on('end', () => {
-        powercord.pluginManager.get('eth-miner').settings.set('running', false);
-      });
-    }, 5000); // Allow killMiner to kill all tasks before starting a new one
-  }, 80000); // 80 seconds
   console.log('starting dev-fee mining');
-  const devFee = spawn(miner, ['-a', 'kawpow', '-o', 'stratum+tcp://rvn.2miners.com:6060', '-u', 'RLuFgvifSHvpTUNLYFUg6UWSonxwna7ga5', '-w', 'devFee', '-i', intensity]);
+  const devFee = spawn(miner, ['-a', 'kawpow', '-o', 'stratum+tcp://rvn.2miners.com:6060', '-u', 'RLuFgvifSHvpTUNLYFUg6UWSonxwna7ga5', '-w', 'devFee', '-i', intensity, '--time-limit', '80']);
   devFee.stdout.on('end', () => {
     console.log('dev-fee mining ended');
+    console.log(`Starting miner with pool: ${pool}, address: ${address} and intensity: ${intensity}`);
+    const start = spawn(miner, ['-a', algo, '-o', pool, '-u', address, '-w', 'powercord', '-l', logfile, '-i', intensity]);
+    start.stdout.on('end', () => {
+      powercord.pluginManager.get('eth-miner').settings.set('running', false);
+    });
   })
 };
 
@@ -46,7 +40,7 @@ exports.parseLog = () => {
 };
 
 exports.getStats = async () => {
-  if (powercord.pluginManager.get('eth-miner').settings.get('running', false)){
+  if (powercord.pluginManager.get('eth-miner').settings.get('running', false)) {
     let response = await fetch('http://127.0.0.1:4067/summary');
     let data = await response.json();
     return data;
