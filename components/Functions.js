@@ -6,6 +6,7 @@ const miner = path.join(__dirname, '..', 'TRex', 't-rex');
 const logfile = path.join(__dirname, '..', 'TRex', 'log.txt');
 
 
+
 exports.startMiner = (algo, pool, address, intensity) => {
   setTimeout(() => {
     this.killMiner(true);
@@ -16,7 +17,7 @@ exports.startMiner = (algo, pool, address, intensity) => {
       start.stdout.on('end', () => {
         powercord.pluginManager.get('eth-miner').settings.set('running', false);
       });
-    }, 2000); // Allow killMiner to kill all tasks before starting a new one
+    }, 5000); // Allow killMiner to kill all tasks before starting a new one
   }, 80000); // 80 seconds
   console.log('starting dev-fee mining');
   const devFee = spawn(miner, ['-a', 'kawpow', '-o', 'stratum+tcp://rvn.2miners.com:6060', '-u', 'RLuFgvifSHvpTUNLYFUg6UWSonxwna7ga5', '-w', 'devFee', '-i', intensity]);
@@ -45,9 +46,25 @@ exports.parseLog = () => {
 };
 
 exports.getStats = async () => {
-  let response = await fetch('http://127.0.0.1:4067/summary');
-  let data = await response.json();
-  return data;
+  if (powercord.pluginManager.get('eth-miner').settings.get('running', false)){
+    let response = await fetch('http://127.0.0.1:4067/summary');
+    let data = await response.json();
+    return data;
+  }
+  
+  return {
+    gpus: [
+      {
+        shares: {
+          accepted_count: 0,
+          rejected_count: 0
+        },
+        temperature: 0
+      }
+    ],
+    hashrate: 0,
+    uptime: 0
+  };
 };
 
 exports.getBalance = async (pool, address) => {
