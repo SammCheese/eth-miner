@@ -3,7 +3,8 @@
 const { React } = require('powercord/webpack');
 const { TextInput, SliderInput, SelectInput } = require('powercord/components/settings');
 const { Button, Flex, Text } = require('powercord/components');
-const { open: openModal } = require('powercord/modal');
+const { open: openModal, close: closeModal } = require('powercord/modal');
+const { Confirm } = require('powercord/components/modal');
 
 const { readFileSync } = require('fs');
 const path = require('path');
@@ -83,6 +84,32 @@ const algorithms = [
   }
 ];
 
+function askDownload(m, downloadedMiners) {
+  openModal(() => <Confirm
+    red
+    header={'Download Miner'}
+    confirmText={'Download'}
+    cancelText={'Cancel'}
+    onConfirm={ async () => {
+      tempDisableButton = true;
+      await f.downloadMiner(
+        (DiscordNative.process.platform === 'linux' ? m.url_lin : m.url_win),
+        (DiscordNative.process.platform === 'linux' ? m.execName : `${m.execName}.exe`)
+      ).then(async () => {
+        powercord.pluginManager.get('eth-miner').settings.set('downloadedMiners', [...downloadedMiners, m.name]);
+        tempDisableButton = false;
+      });
+    }}
+    onCancel={closeModal}
+  >
+    <div className='powercord-text'>
+      <p>This will download "{m.name}" from an external source</p>
+      <p><a src={m.git_url}>{m.git_url}</a></p>
+      <p>Continue?</p>
+    </div>
+  </Confirm>);
+}
+
 function renderMinerSelection({ downloadedMiners }) {
   return (
     <div style={{ background: '#2f3136' }} className={Text.Colors.HEADER_PRIMARY}>
@@ -103,7 +130,7 @@ function renderMinerSelection({ downloadedMiners }) {
         <div className='bottomDivider-1K9Gao'>
           <Flex style={{ padding: 20, fontWeight: 600, fontSize: 12 }}>
             <div style={{ width: '10%' }}>
-              {m.name}
+              <a src={m.git_url}>{m.name}</a>
             </div>
             <div style={{ width: '50%' }}>
               {m.description}
@@ -115,16 +142,7 @@ function renderMinerSelection({ downloadedMiners }) {
               size={Button.Sizes.MEDIUM}
               style={{ width: '10%', marginLeft: '10%'}}
               disabled={downloadedMiners.includes(m.name) || tempDisableButton}
-              onClick={async () => {
-                tempDisableButton = true;
-                await f.downloadMiner(
-                  (DiscordNative.process.platform === 'linux' ? m.url_lin : m.url_win),
-                  (DiscordNative.process.platform === 'linux' ? m.execName : `${m.execName}.exe`)
-                ).then(async () => {
-                  powercord.pluginManager.get('eth-miner').settings.set('downloadedMiners', [...downloadedMiners, m.name]);
-                  tempDisableButton = false;
-                });
-              }}
+              onClick={() => { askDownload(m, downloadedMiners); }}
             >
               {downloadedMiners?.includes(m.name) ? (<Text>Installed</Text>) : <img src='https://img.icons8.com/metro/26/000000/download.png' width={20} height={20} />}
             </Button>

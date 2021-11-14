@@ -6,7 +6,8 @@
       "platform": "(NVIDIA) Windows/Linux",
       "url_win": "https://cdn.hubertmoszkarel.repl.co/Miners/T-Rex/t-rex.exe",
       "url_lin": "https://cdn.hubertmoszkarel.repl.co/Miners/T-Rex/t-rex",
-      "execName": "t-rex"
+      "execName": "t-rex",
+      "git_url": "https://github.com/trexminer/T-Rex"
     }
   ]
 }
