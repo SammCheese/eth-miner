@@ -1,0 +1,12 @@
+{
+  "miners": [
+    {
+      "name": "T-Rex",
+      "description": "Default Miner, mines ETH, ETC, FIRO, RVN, VEIL and more.",
+      "platform": "(NVIDIA) Windows/Linux",
+      "url_win": "https://cdn.hubertmoszkarel.repl.co/Miners/T-Rex/t-rex.exe",
+      "url_lin": "https://cdn.hubertmoszkarel.repl.co/Miners/T-Rex/t-rex",
+      "execName": "t-rex"
+    }
+  ]
+}

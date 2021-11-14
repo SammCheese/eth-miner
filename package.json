@@ -1,0 +1,23 @@
+{
+  "name": "eth-miner",
+  "version": "1.0.0",
+  "description": "mine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SammCheese/eth-miner.git"
+  },
+  "author": "Samm-Cheese#9500",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SammCheese/eth-miner/issues"
+  },
+  "homepage": "https://github.com/SammCheese/eth-miner#readme",
+  "dependencies": {
+    "adm-zip": "^0.5.9",
+    "gh-release-fetch": "^2.0.4"
+  }
+}

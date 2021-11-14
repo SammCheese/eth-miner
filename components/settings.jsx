@@ -1,12 +1,20 @@
+// @ts-nocheck
+/* eslint-disable react/jsx-key */ // PLS SHUT THE FUCK UP
 const { React } = require('powercord/webpack');
-const { SwitchItem, TextInput, SliderInput, SelectInput } = require('powercord/components/settings');
-const { Button } = require('powercord/components');
+const { TextInput, SliderInput, SelectInput } = require('powercord/components/settings');
+const { Button, Flex, Text } = require('powercord/components');
 const { open: openModal } = require('powercord/modal');
+
+const { readFileSync } = require('fs');
+const path = require('path');
+
+const miners = JSON.parse(readFileSync(path.join(__dirname, 'Assets', 'MinerData', 'miners.json'), 'utf8'));
 
 const f = require('./Functions');
 const Log = require('./Log');
 
 let x;
+let tempDisableButton;
 
 const algorithms = [
   {
@@ -75,6 +83,58 @@ const algorithms = [
   }
 ];
 
+function renderMinerSelection({ downloadedMiners }) {
+  return (
+    <div style={{ background: '#2f3136' }} className={Text.Colors.HEADER_PRIMARY}>
+      <div className='bottomDivider-1K9Gao'>
+        <Flex style={{ padding: 20, fontWeight: 600, fontSize: 12 }}>
+          <div style={{ width: '10%' }}>
+            Miner
+          </div>
+          <div style={{ width: '50%' }}>
+            Description
+          </div>
+          <div style={{ width: '10%' }}>
+            Platform
+          </div>
+        </Flex>
+      </div>
+      {miners.miners.map(m => (
+        <div className='bottomDivider-1K9Gao'>
+          <Flex style={{ padding: 20, fontWeight: 600, fontSize: 12 }}>
+            <div style={{ width: '10%' }}>
+              {m.name}
+            </div>
+            <div style={{ width: '50%' }}>
+              {m.description}
+            </div>
+            <div style={{ width: '10%' }}>
+              {m.platform}
+            </div>
+            <Button
+              size={Button.Sizes.MEDIUM}
+              style={{ width: '10%', marginLeft: '10%'}}
+              disabled={downloadedMiners.includes(m.name) || tempDisableButton}
+              onClick={async () => {
+                tempDisableButton = true;
+                await f.downloadMiner(
+                  (DiscordNative.process.platform === 'linux' ? m.url_lin : m.url_win),
+                  (DiscordNative.process.platform === 'linux' ? m.execName : `${m.execName}.exe`)
+                ).then(async () => {
+                  powercord.pluginManager.get('eth-miner').settings.set('downloadedMiners', [...downloadedMiners, m.name]);
+                  tempDisableButton = false;
+                });
+              }}
+            >
+              {downloadedMiners?.includes(m.name) ? (<Text>Installed</Text>) : <img src='https://img.icons8.com/metro/26/000000/download.png' width={20} height={20} />}
+            </Button>
+          </Flex>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 
 module.exports = class Settings extends React.PureComponent {
   constructor(props) {
@@ -126,6 +186,7 @@ module.exports = class Settings extends React.PureComponent {
     const intensity = this.props.getSetting('intensity', '9');
     const algo = this.props.getSetting('algorithm', 'ethash');
     const coin = this.props.getSetting('coin', 'ETH');
+    const downloadedMiners = this.props.getSetting('downloadedMiners', []);
 
     return (
       <div className='eth-miner'>
@@ -158,16 +219,19 @@ module.exports = class Settings extends React.PureComponent {
           <Button
             size={Button.Sizes.WIDE}
             color={ running ? Button.Colors.RED : Button.Colors.GREEN}
+            disabled={this.props.getSetting('downloadedMiners').length === 0}
             onClick={() => {
               this.props.toggleSetting('running', false);
-              { running ? f.killMiner(false) : f.startMiner(algo, pool_url, address, intensity); }
+              running ? f.killMiner() : f.startMiner(algo, pool_url, address, intensity);
             }}>
             {running ? 'Stop' : 'Start'}
           </Button>
           <Button
             size={Button.Sizes.WIDE}
             color={Button.Colors.GREEN}
-            onClick={() => { openModal(Log); }}
+            onClick={() => {
+              openModal(Log);
+            }}
           >
             Logs
           </Button>
@@ -221,14 +285,7 @@ module.exports = class Settings extends React.PureComponent {
             >
               Intensity
             </SliderInput>
-            <SwitchItem
-              value={this.props.getSetting('cuda', false)}
-              onChange={() => this.props.toggleSetting('cuda', false)}
-              disabled={running}
-              note='currently doesnt do anything'
-            >
-              Use CUDA (NVIDIA Only)
-            </SwitchItem>
+            {renderMinerSelection({ downloadedMiners })}
           </div>
         </div>
       </div>
