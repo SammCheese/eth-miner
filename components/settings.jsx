@@ -257,7 +257,7 @@ module.exports = class Settings extends React.PureComponent {
             <TextInput
               onChange={val => this.props.updateSetting('pool_url', val)}
               defaultValue={this.props.getSetting('pool_url', 'stratum+tcp://eth.2miners.com:2020')}
-              note='e.g stratum+tpc://eth.2miners.com:2020'
+              note='e.g stratum+tcp://eth.2miners.com:2020'
               required={true}
               disabled={running}
             >
