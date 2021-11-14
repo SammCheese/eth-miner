@@ -25,7 +25,7 @@ exports.killMiner = () => {
   let stop = spawn('taskkill', ['/f', '/im', 't-rex.exe']);
   if (DiscordNative.process.platform === 'linux') stop = spawn('killall', ['-9', 't-rex']);
   setTimeout(() => {
-    unlinkSync(logfile);
+    unlinkSync(`${logfile}-trex.txt`);
   }, 1000);
   stop.stdout.on('data', data => {
     console.log(`Terminator: ${data}`);
@@ -34,7 +34,7 @@ exports.killMiner = () => {
 
 exports.parseLog = () => {
   let s = [''];
-  if (existsSync(logfile)) s = readFileSync(logfile).toString().split('\n');
+  if (existsSync(`${logfile}-trex.txt`)) s = readFileSync(`${logfile}-trex.txt`).toString().split('\n');
   return s;
 };
 

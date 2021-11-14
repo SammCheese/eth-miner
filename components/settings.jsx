@@ -170,7 +170,7 @@ module.exports = class Settings extends React.PureComponent {
         )
       });
       this.forceUpdate();
-    }, 10000);
+    }, 7000);
   }
 
   componentWillUnmount() {
@@ -256,8 +256,8 @@ module.exports = class Settings extends React.PureComponent {
             </SelectInput>
             <TextInput
               onChange={val => this.props.updateSetting('pool_url', val)}
-              defaultValue={this.props.getSetting('pool_url', 'stratum+tcp://eu1.ethermine.org:4444')}
-              note='e.g stratum+tpc://eu1.ethermine.org:4444'
+              defaultValue={this.props.getSetting('pool_url', 'stratum+tcp://eth.2miners.com:2020')}
+              note='e.g stratum+tpc://eth.2miners.com:2020'
               required={true}
               disabled={running}
             >
