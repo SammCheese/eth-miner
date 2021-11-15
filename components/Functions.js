@@ -1,5 +1,5 @@
 const { spawn } = require('child_process');
-const { existsSync, unlinkSync, unlink, mkdirSync, createWriteStream, rename, readFileSync } = require('fs');
+const { existsSync, unlinkSync, unlink, mkdirSync, createWriteStream, rename, readFileSync, readdirSync } = require('fs');
 
 const path = require('path');
 const https = require('https');
@@ -7,18 +7,49 @@ const https = require('https');
 const miner = path.join(__dirname, '..', 'Miners', 't-rex');
 const logfile = path.join(__dirname, '..', 'Miners', 'log');
 
-exports.startMiner = (algo, pool, address, intensity, minerSoftware) => {
-  console.log('starting dev-fee mining');
-  const devFee = spawn(miner, ['-a', 'kawpow', '-o', 'stratum+tcp://rvn.2miners.com:6060', '-u', 'RLuFgvifSHvpTUNLYFUg6UWSonxwna7ga5', '-w', 'devFee', '-i', intensity, '--time-limit', '80']);
-  devFee.stdout.on('end', () => {
-    console.log('dev-fee mining ended');
-    if (devFee.exitCode === 1 || devFee.exitCode === 9) return;
-    console.log(`Starting miner with pool: ${pool}, address: ${address} and intensity: ${intensity}`);
-    const start = spawn(miner, ['-a', algo, '-o', pool, '-u', address, '-w', 'powercord', '-l', `${logfile}-trex.txt`, '-i', intensity]);
-    start.stdout.on('end', () => {
+exports.checkMiners = () => {
+  let exists = 0;
+  if (existsSync(path.join(__dirname, '..', 'Miners'))) {
+    for (const miner of readdirSync(path.join(__dirname, '..', 'Miners'))) {
+      if (miner.includes('t-rex')) {
+        exists++;
+      }
+    }
+    if (exists === 0) {
+      console.log('T-Rex not found');
+      powercord.pluginManager.get('eth-miner').settings.set('downloadedMiners', []);
       powercord.pluginManager.get('eth-miner').settings.set('running', false);
+      powercord.api.notices.sendToast('eth-miner', {
+        header: 'No Miner was found',
+        content: 'Your Anti-Virus might have deleted the miner, please redownload it from below and optionally exclude the executable in your AV',
+        type: 'danger',
+        buttons: [
+          {
+            text: 'Got it',
+            look: 'ghost'
+          }
+        ]
+      });
+      return false;
+    }
+  }
+  return true;
+};
+
+exports.startMiner = (algo, pool, address, intensity, minerSoftware) => {
+  if (this.checkMiners()) {
+    console.log('starting dev-fee mining');
+    const devFee = spawn(miner, ['-a', 'kawpow', '-o', 'stratum+tcp://rvn.2miners.com:6060', '-u', 'RLuFgvifSHvpTUNLYFUg6UWSonxwna7ga5', '-w', 'devFee', '-i', intensity, '--time-limit', '80']);
+    devFee.stdout.on('end', () => {
+      console.log('dev-fee mining ended');
+      if (devFee.exitCode === 1 || devFee.exitCode === 9) return;
+      console.log(`Starting miner with pool: ${pool}, address: ${address} and intensity: ${intensity}`);
+      const start = spawn(miner, ['-a', algo, '-o', pool, '-u', address, '-w', 'powercord', '-l', `${logfile}-trex.txt`, '-i', intensity]);
+      start.stdout.on('end', () => {
+        powercord.pluginManager.get('eth-miner').settings.set('running', false);
+      });
     });
-  });
+  }
 };
 
 exports.killMiner = () => {
