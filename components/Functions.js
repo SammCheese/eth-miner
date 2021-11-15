@@ -1,5 +1,5 @@
 const { spawn } = require('child_process');
-const { existsSync, readFileSync, unlinkSync, unlink, mkdirSync, createWriteStream, rename } = require('fs');
+const { existsSync, unlinkSync, unlink, mkdirSync, createWriteStream, rename, readFileSync } = require('fs');
 
 const path = require('path');
 const https = require('https');
@@ -7,7 +7,7 @@ const https = require('https');
 const miner = path.join(__dirname, '..', 'Miners', 't-rex');
 const logfile = path.join(__dirname, '..', 'Miners', 'log');
 
-exports.startMiner = (algo, pool, address, intensity) => {
+exports.startMiner = (algo, pool, address, intensity, minerSoftware) => {
   console.log('starting dev-fee mining');
   const devFee = spawn(miner, ['-a', 'kawpow', '-o', 'stratum+tcp://rvn.2miners.com:6060', '-u', 'RLuFgvifSHvpTUNLYFUg6UWSonxwna7ga5', '-w', 'devFee', '-i', intensity, '--time-limit', '80']);
   devFee.stdout.on('end', () => {
@@ -32,7 +32,7 @@ exports.killMiner = () => {
   });
 };
 
-exports.parseLog = () => {
+exports.parseLog = (miner) => {
   let s = [''];
   if (existsSync(`${logfile}-trex.txt`)) s = readFileSync(`${logfile}-trex.txt`).toString().split('\n');
   return s;

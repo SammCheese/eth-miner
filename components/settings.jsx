@@ -237,7 +237,7 @@ module.exports = class Settings extends React.PureComponent {
           <Button
             size={Button.Sizes.WIDE}
             color={ running ? Button.Colors.RED : Button.Colors.GREEN}
-            disabled={this.props.getSetting('downloadedMiners').length === 0}
+            disabled={this.props.getSetting('downloadedMiners', []).length === 0}
             onClick={() => {
               this.props.toggleSetting('running', false);
               running ? f.killMiner() : f.startMiner(algo, pool_url, address, intensity);
