@@ -8,14 +8,9 @@ const miner = path.join(__dirname, '..', 'Miners', 't-rex');
 const logfile = path.join(__dirname, '..', 'Miners', 'log');
 
 exports.checkMiners = () => {
-  let exists = 0;
   if (existsSync(path.join(__dirname, '..', 'Miners'))) {
-    for (const miner of readdirSync(path.join(__dirname, '..', 'Miners'))) {
-      if (miner.includes('t-rex')) {
-        exists++;
-      }
-    }
-    if (exists === 0) {
+    const check = readdirSync(path.join(__dirname, '..', 'Miners')).some(e => e.includes('t-rex'));
+    if (!check) {
       console.log('T-Rex not found');
       powercord.pluginManager.get('eth-miner').settings.set('downloadedMiners', []);
       powercord.pluginManager.get('eth-miner').settings.set('running', false);
