@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-key */ // PLS SHUT THE FUCK UP
 const { React } = require('powercord/webpack');
 const { TextInput, SliderInput, SelectInput } = require('powercord/components/settings');
-const { Button, Flex, Text } = require('powercord/components');
+const { Button, Flex, Text, Icon } = require('powercord/components');
 const { open: openModal, close: closeModal } = require('powercord/modal');
 const { Confirm } = require('powercord/components/modal');
 
@@ -13,6 +13,7 @@ const miners = JSON.parse(readFileSync(path.join(__dirname, 'Assets', 'MinerData
 
 const f = require('./Functions');
 const Log = require('./Log');
+const HelpModal = require('./helpModal.jsx');
 
 let x;
 let tempDisableButton;
@@ -220,6 +221,11 @@ module.exports = class Settings extends React.PureComponent {
           </div>
           <div className='eth-counter-add'>
             {coin}
+            <a>
+              <Icon
+							className='help-icon' name='HelpCircle' id='eth-help' size={16}
+							onClick={() => openModal(() => <HelpModal />)} />
+            </a>
           </div>
           <div className='eth-info'>
             <div className='eth-info-item'>
