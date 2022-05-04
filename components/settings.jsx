@@ -113,7 +113,7 @@ function askDownload(m, downloadedMiners) {
 
 function renderMinerSelection({ downloadedMiners }) {
   return (
-    <div style={{ background: '#2f3136' }} className={Text.Colors.HEADER_PRIMARY}>
+    <div style={{ background: '#2f3136' }}>
       <div className='bottomDivider-1K9Gao'>
         <Flex style={{ padding: 20, fontWeight: 600, fontSize: 12 }}>
           <div style={{ width: '10%' }}>
